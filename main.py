@@ -1,15 +1,22 @@
 from machine import Pin
-from time import sleep
+import dht
+import time
 
-# กำหนดขา LED บนบอร์ด (Pico/Pico W ใช้ GPIO25)
-led = Pin("LED", Pin.OUT)
+sensor_pin = Pin(28, Pin.IN, Pin.PULL_UP)   # ใช้ขา GP28
+sensor = dht.DHT22(sensor_pin)
 
 while True:
-    led.value(1)  # เปิด LED
-    sleep(0.5)    # รอ 0.5 วินาที
-    led.value(0)  # ปิด LED
-    sleep(0.5)    # รอ 0.5 วินาที
-    print("hello world")
+    try:
+        sensor.measure()
+        temp = sensor.temperature()
+        hum = sensor.humidity()
 
+        print("Temperature: ", temp, "°C")
+        print("Humidity: ", hum, "%")
+        
+    except Exception as e:
+        print("Error:", e)
+
+    time.sleep(2)   # อ่านทุก 2 วินาที
 
 
