@@ -43,17 +43,21 @@ def send_line_message(message):
     data = {
         "to": TO_USER_ID,
         "messages": [
-            {"type": "text", "text": message}
+            {
+                "type": "text",
+                "text": message
+            }
         ]
     }
 
     try:
-        response = urequests.post(url, headers=headers, data=ujson.dumps(data))
+        payload = ujson.dumps(data)
+        print("JSON Payload:", payload)   # Debug ดู payload ก่อนส่ง
+        response = urequests.post(url, headers=headers, data=payload)
         print("LINE Response:", response.text)
         response.close()
     except Exception as e:
         print("Send LINE Error:", e)
-
 # ---------------------------------------------------------
 # 5. ตั้งค่าเซนเซอร์ DHT22
 # ---------------------------------------------------------
@@ -68,14 +72,14 @@ connect_wifi()
 while True:
     try:
         sensor.measure()
-        temp = sensor.temperature()
-        hum = sensor.humidity()
 
-        print("Temperature:", temp, "°C")
-        print("Humidity:", hum, "%")
+        temp = round(sensor.temperature(), 1)
+        hum = round(sensor.humidity(), 1)
 
-        # ส่งข้อความไป LINE
-        message = f"🌡 Temp: {temp} °C\n💧 Humidity: {hum}%"
+        print("Temperature:", temp)
+        print("Humidity:", hum)
+
+        message = "Temp: {} C\nHumidity: {} %".format(temp, hum)
         send_line_message(message)
 
     except Exception as e:
